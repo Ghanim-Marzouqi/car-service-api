@@ -1,4 +1,7 @@
 const { connection } = require("../db");
+const mysql = require("mysql2/promise");
+const bluebird = require("bluebird");
+const e = require("express");
 
 // POST: body(username, password)
 const authenticateUser = (req, res) => {
@@ -89,11 +92,11 @@ const updateUserProfile = (req, res) => {
   }
 
   const { id } = req.params;
-  const { name, email, phone, username, userType, regionId, willayatId } = req.body;
+  const { name, email, phone, region_id, willayat_id } = req.body;
 
   connection
-    .query("UPDATE users SET name = ? AND email = ? AND phone = ? AND username = ? AND user_type = ? AND region_id = ? AND willayat_id = ? WHERE id = ?",
-      [name, email, phone, username, userType, regionId, willayatId, id],
+    .query("UPDATE users SET name = ?, email = ?, phone = ?, region_id = ?, willayat_id = ? WHERE id = ?",
+      [name, email, phone, region_id, willayat_id, id],
       (err, result, fields) => {
         if (err) {
           res.json({
@@ -152,10 +155,17 @@ const getUserProfile = (req, res) => {
 }
 
 // PUT: params(id) - body(oldPassword, newPassword)
-const changePassword = (req, res) => {
-  const body = req.body;
+const changePassword = async (req, res) => {
 
-  if (!body) {
+  const connect = await mysql.createConnection({
+    host: "192.168.64.3",
+    user: "test",
+    password: "",
+    database: "car_service",
+    Promise: bluebird
+  });
+
+  if (!req.body) {
     res.json({
       status: "error",
       message: "Data sent is incomplete",
@@ -166,45 +176,33 @@ const changePassword = (req, res) => {
   const { id } = req.params;
   const { oldPassword, newPassword } = req.body;
 
-  connection
-    .query("SELECT * FROM users WHERE id = ?",
-      [id],
-      (err, user, fields) => {
-        if (err) {
-          res.json({
-            status: "error",
-            message: "Cannot fetch user",
-            data: null
-          });
-        }
+  const [userRows, userFields] = await connect.execute("SELECT * FROM users WHERE id = ?", [id]);
 
-        if (user.password === oldPassword) {
-          connection
-            .query("UPDATE users SET password = ? WHERE id = ?",
-              [newPassword],
-              (err, result, fields) => {
-                if (err) {
-                  res.json({
-                    status: "error",
-                    message: "Cannot update password",
-                    data: null
-                  });
-                }
+  const user = userRows[0];
 
-                res.json({
-                  status: "success",
-                  message: "Password updated successfully",
-                  data: true
-                });
-              });
-        } else {
-          res.json({
-            status: "error",
-            message: "Old password is incorrect",
-            data: null
-          });
-        }
+  if (user.password === oldPassword) {
+    const [rows, fields] = await connect.execute("UPDATE users SET password = ? WHERE id = ?", [newPassword, id]);
+
+    if (rows.changedRows > 0) {
+      res.json({
+        status: "success",
+        message: "Password updated successfully",
+        data: true
       });
+    } else {
+      res.json({
+        status: "error",
+        message: "Password cannot be updated",
+        data: false
+      });
+    }
+  } else {
+    res.json({
+      status: "error",
+      message: "Old password is incorrect",
+      data: null
+    });
+  }
 }
 
 // GET: params(id)

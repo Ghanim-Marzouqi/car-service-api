@@ -6,6 +6,42 @@ const createUser = (req, res) => {
 
 const updateUser = (req, res) => {
 
+  if (!req.body || !req.params) {
+    res.json({
+      status: "error",
+      message: "Missing user data",
+      data: null
+    });
+  }
+
+  const { id } = req.params;
+  const { name, email, phone, region_id, willayat_id } = req.body;
+
+  connection.query("UPDATE `users` SET name = ?, email = ?, phone = ?, region_id = ?, willayat_id = ? WHERE id = ?",
+    [name, email, phone, region_id, willayat_id, id],
+    (err, results, fields) => {
+      if (err) {
+        res.json({
+          status: "error",
+          message: "Cannot update user",
+          data: null
+        });
+      }
+
+      if (results.length > 0) {
+        res.json({
+          status: "success",
+          message: "User updated successfully",
+          data: true
+        });
+      } else {
+        res.json({
+          status: "success",
+          message: "User NOT updated",
+          data: false
+        });
+      }
+    });
 }
 
 const deleteUser = (req, res) => {
