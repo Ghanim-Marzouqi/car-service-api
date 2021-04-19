@@ -1,7 +1,51 @@
 const { connection } = require("../db");
 
 const createUser = (req, res) => {
+  if (!req.body) {
+    res.json({
+      status: "error",
+      message: "Data sent are not complete",
+      data: null
+    });
+  }
 
+  const { name, email, phone, username, password, user_type, region_id, willayat_id } = req.body;
+
+  connection.query("INSERT INTO `users` (name, email, phone, username, password, user_type, region_id, willayat_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+    [name, email, phone, username, password, user_type, region_id, willayat_id],
+    (err, results, fields) => {
+      if (err) {
+        res.json({
+          status: "error",
+          message: "Cannot create user",
+          data: null
+        });
+      }
+
+      if (results.affectedRows === 1) {
+        res.json({
+          status: "success",
+          message: "User created successfully",
+          data: {
+            id: results.insertId,
+            name,
+            email,
+            phone,
+            username,
+            user_type,
+            password,
+            region_id,
+            willayat_id
+          }
+        });
+      } else {
+        res.json({
+          status: "error",
+          message: "User not created",
+          data: null
+        });
+      }
+    });
 }
 
 const updateUser = (req, res) => {
