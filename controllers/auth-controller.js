@@ -1,7 +1,4 @@
-const { connection } = require("../db");
-const mysql = require("mysql2/promise");
-const bluebird = require("bluebird");
-const e = require("express");
+const { pool } = require("../db");
 
 // POST: body(username, password)
 const authenticateUser = (req, res) => {
@@ -17,7 +14,7 @@ const authenticateUser = (req, res) => {
 
   const { username, password } = req.body;
 
-  connection
+  pool
     .query("SELECT * FROM users WHERE username = ? AND password = ?",
       [username, password],
       (err, results, fields) => {
@@ -59,7 +56,7 @@ const createUser = (req, res) => {
 
   const { name, email, phone, username, password, userType, regionId, willayatId } = req.body;
 
-  connection
+  pool
     .query("INSERT INTO users (name, email, phone, username, password, user_type, region_id, willayat_id) VALUES (?,?,?,?,?,?,?,?)",
       [name, email, phone, username, password, userType, regionId, willayatId],
       (err, result, fields) => {
@@ -94,7 +91,7 @@ const updateUserProfile = (req, res) => {
   const { id } = req.params;
   const { name, email, phone, region_id, willayat_id } = req.body;
 
-  connection
+  pool
     .query("UPDATE users SET name = ?, email = ?, phone = ?, region_id = ?, willayat_id = ? WHERE id = ?",
       [name, email, phone, region_id, willayat_id, id],
       (err, result, fields) => {
@@ -126,7 +123,7 @@ const getUserProfile = (req, res) => {
     });
   }
 
-  connection
+  pool
     .query("SELECT * FROM users WHERE id = ?",
       [id],
       (err, results, fields) => {
@@ -157,14 +154,6 @@ const getUserProfile = (req, res) => {
 // PUT: params(id) - body(oldPassword, newPassword)
 const changePassword = async (req, res) => {
 
-  const connect = await mysql.createConnection({
-    host: "192.168.64.3",
-    user: "test",
-    password: "",
-    database: "car_service",
-    Promise: bluebird
-  });
-
   if (!req.body) {
     res.json({
       status: "error",
@@ -173,15 +162,17 @@ const changePassword = async (req, res) => {
     });
   }
 
+  const poolPromise = pool.promise();
+
   const { id } = req.params;
   const { oldPassword, newPassword } = req.body;
 
-  const [userRows, userFields] = await connect.execute("SELECT * FROM users WHERE id = ?", [id]);
+  const [userRows, userFields] = await poolPromise.query("SELECT * FROM users WHERE id = ?", [id]);
 
   const user = userRows[0];
 
   if (user.password === oldPassword) {
-    const [rows, fields] = await connect.execute("UPDATE users SET password = ? WHERE id = ?", [newPassword, id]);
+    const [rows, fields] = await poolPromise.query("UPDATE users SET password = ? WHERE id = ?", [newPassword, id]);
 
     if (rows.changedRows > 0) {
       res.json({
@@ -209,7 +200,7 @@ const changePassword = async (req, res) => {
 const getUserGarages = (req, res) => {
   const { id } = req.params;
 
-  connection
+  pool
     .query("SELECT * FROM `garages` WHERE owner_id = ?",
       [id],
       (err, results, fields) => {

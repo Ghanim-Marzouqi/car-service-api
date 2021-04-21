@@ -1,4 +1,4 @@
-const { connection } = require("../db");
+const { pool } = require("../db");
 
 const createService = (req, res) => {
   if (!req.body) {
@@ -11,7 +11,7 @@ const createService = (req, res) => {
 
   const { name, description, price } = req.body;
 
-  connection.query("INSERT INTO `services` (name, description, price) VALUES (?, ?, ?)",
+  pool.query("INSERT INTO `services` (name, description, price) VALUES (?, ?, ?)",
     [name, description, price],
     (err, results, fields) => {
       if (err) {
@@ -55,7 +55,7 @@ const updateService = (req, res) => {
   const { id } = req.params;
   const { name, description, price } = req.body;
 
-  connection.query("UPDATE `services` SET name = ?, description = ?, price = ? WHERE id = ?",
+  pool.query("UPDATE `services` SET name = ?, description = ?, price = ? WHERE id = ?",
     [name, description, price, id],
     (err, results, fields) => {
       if (err) {
@@ -103,7 +103,7 @@ const deleteService = (req, res) => {
 
   const { id } = req.params;
 
-  connection.query("DELETE FROM `services` WHERE id = ?", [id], (err, results, fields) => {
+  pool.query("DELETE FROM `services` WHERE id = ?", [id], (err, results, fields) => {
     if (err) {
       res.json({
         status: "error",
@@ -139,7 +139,7 @@ const getServiceById = (req, res) => {
 
   const { id } = req.params;
 
-  connection.query("SELECT * FROM `services` WHERE id = ?", [id], (err, results, fields) => {
+  pool.query("SELECT * FROM `services` WHERE id = ?", [id], (err, results, fields) => {
     if (err) {
       res.json({
         status: "error",
@@ -165,7 +165,7 @@ const getServiceById = (req, res) => {
 }
 
 const getAllServices = (req, res) => {
-  connection.query("SELECT * FROM `services`", (err, results, fields) => {
+  pool.query("SELECT * FROM `services`", (err, results, fields) => {
     if (err) {
       res.json({
         status: "error",

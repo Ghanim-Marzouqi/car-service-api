@@ -1,4 +1,4 @@
-const { connection } = require("../db");
+const { pool } = require("../db");
 
 const createUser = (req, res) => {
   if (!req.body) {
@@ -11,7 +11,7 @@ const createUser = (req, res) => {
 
   const { name, email, phone, username, password, user_type, region_id, willayat_id } = req.body;
 
-  connection.query("INSERT INTO `users` (name, email, phone, username, password, user_type, region_id, willayat_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+  pool.query("INSERT INTO `users` (name, email, phone, username, password, user_type, region_id, willayat_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
     [name, email, phone, username, password, user_type, region_id, willayat_id],
     (err, results, fields) => {
       if (err) {
@@ -61,7 +61,7 @@ const updateUser = (req, res) => {
   const { id } = req.params;
   const { name, email, phone, region_id, willayat_id } = req.body;
 
-  connection.query("UPDATE `users` SET name = ?, email = ?, phone = ?, region_id = ?, willayat_id = ? WHERE id = ?",
+  pool.query("UPDATE `users` SET name = ?, email = ?, phone = ?, region_id = ?, willayat_id = ? WHERE id = ?",
     [name, email, phone, region_id, willayat_id, id],
     (err, results, fields) => {
       if (err) {
@@ -97,7 +97,7 @@ const getUserById = (req, res) => {
 }
 
 const getAllUsers = (req, res) => {
-  connection.query("SELECT u.id, u.name, u.email, u.phone, u.username, u.user_type, u.region_id, u.willayat_id, r.name as 'region_name', w.name as 'willayat_name' FROM `users` u LEFT JOIN `regions` r ON r.id = u.region_id LEFT JOIN `willayats` w ON w.id = u.willayat_id", (err, results, fields) => {
+  pool.query("SELECT u.id, u.name, u.email, u.phone, u.username, u.user_type, u.region_id, u.willayat_id, r.name as 'region_name', w.name as 'willayat_name' FROM `users` u LEFT JOIN `regions` r ON r.id = u.region_id LEFT JOIN `willayats` w ON w.id = u.willayat_id", (err, results, fields) => {
     if (err) {
       res.json({
         status: "error",

@@ -8,5 +8,6 @@ router.put("/garage/:id", controller.updateGarage);
 router.delete("/garage/:id", controller.deleteGarage);
 router.get("/garage/:id", controller.getGarageById);
 router.get("/garages", controller.getAllGarages);
+router.get("/garage-owners", controller.getGarageOwners);
 
 module.exports = router;
