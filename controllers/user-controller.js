@@ -59,10 +59,10 @@ const updateUser = (req, res) => {
   }
 
   const { id } = req.params;
-  const { name, email, phone, region_id, willayat_id } = req.body;
+  const { name, email, phone, user_type, region_id, willayat_id } = req.body;
 
-  pool.query("UPDATE `users` SET name = ?, email = ?, phone = ?, region_id = ?, willayat_id = ? WHERE id = ?",
-    [name, email, phone, region_id, willayat_id, id],
+  pool.query("UPDATE `users` SET name = ?, email = ?, phone = ?, user_type = ?, region_id = ?, willayat_id = ? WHERE id = ?",
+    [name, email, phone, user_type, region_id, willayat_id, id],
     (err, results, fields) => {
       if (err) {
         res.json({
@@ -72,7 +72,7 @@ const updateUser = (req, res) => {
         });
       }
 
-      if (results.length > 0) {
+      if (results.affectedRows === 1) {
         res.json({
           status: "success",
           message: "User updated successfully",
@@ -80,7 +80,7 @@ const updateUser = (req, res) => {
         });
       } else {
         res.json({
-          status: "success",
+          status: "error",
           message: "User NOT updated",
           data: false
         });
@@ -89,11 +89,67 @@ const updateUser = (req, res) => {
 }
 
 const deleteUser = (req, res) => {
+  if (!req.params) {
+    res.json({
+      status: "error",
+      message: "Data sent is not complete",
+      data: null
+    });
+  }
 
+  const { id } = req.params;
+
+  pool.query("DELETE FROM `users` WHERE id = ?", [id], (err, result, fields) => {
+    if (err) {
+      res.json({
+        status: "error",
+        message: "Cannot delete user",
+        data: null
+      });
+    }
+
+    if (result.affectedRows === 1) {
+      res.json({
+        status: "success",
+        message: "User deleted successfully",
+        data: true
+      });
+    } else {
+      es.json({
+        status: "error",
+        message: "User not found",
+        data: false
+      });
+    }
+  });
 }
 
 const getUserById = (req, res) => {
+  if (!req.params) {
+    res.json({
+      status: "error",
+      message: "Data sent is not complete",
+      data: null
+    });
+  }
 
+  const { id } = req.params;
+
+  pool.query("SELECT * FROM `users` WHERE id = ?", [id], (err, result, fields) => {
+    if (err) {
+      res.json({
+        status: "error",
+        message: "Cannot get user",
+        data: null
+      });
+    }
+
+    res.json({
+      status: "success",
+      message: "User fetched successfully",
+      data: result[0]
+    });
+  });
 }
 
 const getAllUsers = (req, res) => {

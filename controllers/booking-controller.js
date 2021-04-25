@@ -7,7 +7,40 @@ const createBooking = (req, res) => {
 }
 
 const updateBooking = (req, res) => {
+  if (!req.params) {
+    res.json({
+      status: "error",
+      message: "Data sent is complete",
+      data: null
+    });
+  }
 
+  const { id } = req.params;
+  const { is_confirmed, is_paid } = req.body;
+
+  pool.query("UPDATE `bookings` SET is_confirmed = ?, is_paid = ? WHERE id = ?", [is_confirmed, is_paid, id], (err, result, fields) => {
+    if (err) {
+      res.json({
+        status: "error",
+        message: "Cannot update booking",
+        data: null
+      });
+    }
+
+    if (result.affectedRows === 1) {
+      res.json({
+        status: "success",
+        message: "Booking updated successfully",
+        data: true
+      });
+    } else {
+      res.json({
+        status: "error",
+        message: "Booking not found",
+        data: false
+      });
+    }
+  });
 }
 
 const deleteBooking = (req, res) => {
