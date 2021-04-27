@@ -190,6 +190,34 @@ const getAllGarages = (req, res) => {
   });
 }
 
+const getAllGaragesByRegionIdAndWillayatId = (req, res) => {
+  if (!req.body) {
+    res.json({
+      status: "error",
+      message: "Data sent is not complete",
+      data: null
+    });
+  }
+
+  const { region_id, willayat_id } = req.body;
+
+  pool.query("SELECT * FROM `garages` WHERE region_id = ? AND willayat_id = ?", [region_id, willayat_id], (err, result, fields) => {
+    if (err) {
+      res.json({
+        status: "error",
+        message: "Cannot get garages",
+        data: null
+      });
+    }
+
+    res.json({
+      status: "success",
+      message: "Garages fetched successfully",
+      data: result
+    });
+  });
+}
+
 const getGarageOwners = (req, res) => {
   pool.query("SELECT * FROM `users` WHERE user_type = 'GARAGE_OWNER'", (err, result, fields) => {
     if (err) {
@@ -208,11 +236,49 @@ const getGarageOwners = (req, res) => {
   });
 }
 
+const getFullGarageDetails = (req, res) => {
+  if (!req.params) {
+    res.json({
+      status: "error",
+      message: "Data sent is not complete",
+      data: null
+    });
+  }
+
+  const { id } = req.params;
+
+  pool.query("SELECT g.*, u.name as 'owner_name', s.name as 'service_name', s.price as 'service_price', r.name as 'region_name', w.name as 'willayat_name' FROM `garages` g LEFT JOIN `users` u ON g.owner_id = u.id LEFT JOIN `services` s ON g.service_id = s.id LEFT JOIN `regions` r ON g.region_id = r.id LEFT JOIN `willayats` w ON g.willayat_id = w.id WHERE g.id = ?", [id], (err, result, fields) => {
+    if (err) {
+      res.json({
+        status: "error",
+        message: "Cannot get garage details",
+        data: null
+      });
+    }
+
+    if (result.length > 0) {
+      res.json({
+        status: "success",
+        message: "Garage details fetched successfully",
+        data: result[0]
+      });
+    } else {
+      res.json({
+        status: "error",
+        message: "Garage not found",
+        data: null
+      });
+    }
+  })
+}
+
 module.exports = {
   createGarage,
   updateGarage,
   deleteGarage,
   getGarageById,
   getAllGarages,
-  getGarageOwners
+  getGarageOwners,
+  getAllGaragesByRegionIdAndWillayatId,
+  getFullGarageDetails
 }

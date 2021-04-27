@@ -54,11 +54,11 @@ const createUser = (req, res) => {
     });
   }
 
-  const { name, email, phone, username, password, userType, regionId, willayatId } = req.body;
+  const { name, email, phone, username, password, user_type, region_id, willayat_id } = req.body;
 
   pool
     .query("INSERT INTO users (name, email, phone, username, password, user_type, region_id, willayat_id) VALUES (?,?,?,?,?,?,?,?)",
-      [name, email, phone, username, password, userType, regionId, willayatId],
+      [name, email, phone, username, password, user_type, region_id, willayat_id],
       (err, result, fields) => {
         if (err) {
           res.json({
@@ -68,11 +68,19 @@ const createUser = (req, res) => {
           });
         }
 
-        res.json({
-          status: "success",
-          message: "User created successfully",
-          data: true
-        });
+        if (result.insertId && result.insertId > 0) {
+          res.json({
+            status: "success",
+            message: "User created successfully",
+            data: true
+          });
+        } else {
+          res.json({
+            status: "error",
+            message: "Cannot create user",
+            data: false
+          });
+        }
       });
 }
 
