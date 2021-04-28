@@ -14,7 +14,7 @@ const sendMail = (email, subject, message) => {
   });
 
   var mailOptions = {
-    from: "optimist_gm@hotmail.com",
+    from: '"Car Service" <optimist_gm@hotmail.com>',
     to: email,
     subject: subject,
     text: message,
