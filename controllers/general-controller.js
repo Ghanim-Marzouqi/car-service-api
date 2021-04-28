@@ -1,4 +1,5 @@
 const { pool } = require("../db");
+const { sendMail } = require("../utils/mail-sender");
 
 const getStatistics = async (req, res) => {
   let service_count = 0;
@@ -78,8 +79,28 @@ const getWillayats = async (req, res) => {
   }
 }
 
+const sendEmailNotification = (req, res) => {
+  if (!req.body) {
+    res.json({
+      status: "error",
+      message: "Data sent not complete",
+      data: null
+    });
+  }
+
+  const { email, subject, message } = req.body;
+  sendMail(email, subject, message);
+
+  res.json({
+    status: "success",
+    message: "Email sent successfully",
+    data: true
+  });
+}
+
 module.exports = {
   getStatistics,
   getRegions,
-  getWillayats
+  getWillayats,
+  sendEmailNotification
 }
