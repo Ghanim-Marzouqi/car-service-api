@@ -98,7 +98,7 @@ const getAllBookings = async (req, res) => {
 
   if (typeof garageIds !== "undefined" && garageIds.length > 0) {
     for (let i = 0; i < garageIds.length; i++) {
-      const [rows, fields] = await poolPromise.query("SELECT b.id, b.booking_date, b.is_confirmed, b.is_paid, u.name as 'customer_name', s.name as 'service_name', g.name as 'garage_name' FROM `bookings` b LEFT JOIN `users` u ON u.id = b.user_id LEFT JOIN `services` s ON s.id = b.service_id LEFT JOIN `garages` g ON g.id = b.garage_id WHERE b.garage_id = ? ORDER BY b.booking_date", [garageIds[i]]);
+      const [rows, fields] = await poolPromise.query("SELECT b.id, b.booking_date, b.is_confirmed, b.is_paid, u.name as 'customer_name', u.email as 'customer_email', s.name as 'service_name', g.name as 'garage_name' FROM `bookings` b LEFT JOIN `users` u ON u.id = b.user_id LEFT JOIN `services` s ON s.id = b.service_id LEFT JOIN `garages` g ON g.id = b.garage_id WHERE b.garage_id = ? ORDER BY b.booking_date", [garageIds[i]]);
       if (rows.length > 0) {
         bookings = [...bookings, ...rows];
       }
