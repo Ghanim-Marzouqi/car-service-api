@@ -272,6 +272,34 @@ const getFullGarageDetails = (req, res) => {
   })
 }
 
+const getOwnerGarages = (req, res) => {
+  if (!req.params) {
+    res.json({
+      status: "error",
+      message: "Data sent is not complate",
+      data: null
+    });
+  }
+
+  const { owner_id } = req.params;
+
+  pool.query("SELECT g.*, u.name as 'owner_name', s.name as 'service_name', r.name as 'region_name', w.name as 'willayat_name' FROM `garages` g LEFT JOIN `users` u ON g.owner_id = u.id LEFT JOIN `services` s ON g.service_id = s.id LEFT JOIN `regions` r ON g.region_id = r.id LEFT JOIN `willayats` w ON g.willayat_id = w.id WHERE g.owner_id = ?", [owner_id], (err, result, fields) => {
+    if (err) {
+      res.json({
+        status: "error",
+        message: "Cannot get owner garages",
+        data: null
+      });
+    }
+
+    res.json({
+      status: "success",
+      message: "Garages fetched successfully",
+      data: result
+    });
+  });
+}
+
 module.exports = {
   createGarage,
   updateGarage,
@@ -280,5 +308,6 @@ module.exports = {
   getAllGarages,
   getGarageOwners,
   getAllGaragesByRegionIdAndWillayatId,
-  getFullGarageDetails
+  getFullGarageDetails,
+  getOwnerGarages
 }

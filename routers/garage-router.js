@@ -11,5 +11,6 @@ router.get("/garages", controller.getAllGarages);
 router.post("/garages", controller.getAllGaragesByRegionIdAndWillayatId);
 router.get("/garage-owners", controller.getGarageOwners);
 router.get("/garage-details/:id", controller.getFullGarageDetails);
+router.get("/owner-garages/:owner_id", controller.getOwnerGarages);
 
 module.exports = router;

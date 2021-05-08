@@ -17,12 +17,12 @@ const createUser = (req, res) => {
       if (err) {
         res.json({
           status: "error",
-          message: "Cannot create user",
+          message: "User already exists",
           data: null
         });
       }
 
-      if (results.affectedRows === 1) {
+      if (results && results.affectedRows === 1) {
         res.json({
           status: "success",
           message: "User created successfully",
