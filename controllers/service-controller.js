@@ -9,10 +9,10 @@ const createService = (req, res) => {
     });
   }
 
-  const { name, description, price } = req.body;
+  const { name, description } = req.body;
 
-  pool.query("INSERT INTO `services` (name, description, price) VALUES (?, ?, ?)",
-    [name, description, price],
+  pool.query("INSERT INTO `services` (name, description) VALUES (?, ?)",
+    [name, description],
     (err, results, fields) => {
       if (err) {
         res.json({
@@ -28,8 +28,7 @@ const createService = (req, res) => {
         data: {
           id: results.insertId,
           name,
-          description,
-          price
+          description
         }
       });
     });
@@ -53,10 +52,10 @@ const updateService = (req, res) => {
   }
 
   const { id } = req.params;
-  const { name, description, price } = req.body;
+  const { name, description } = req.body;
 
-  pool.query("UPDATE `services` SET name = ?, description = ?, price = ? WHERE id = ?",
-    [name, description, price, id],
+  pool.query("UPDATE `services` SET name = ?, description = ? WHERE id = ?",
+    [name, description, id],
     (err, results, fields) => {
       if (err) {
         res.json({
@@ -73,8 +72,7 @@ const updateService = (req, res) => {
           data: {
             id,
             name,
-            description,
-            price
+            description
           }
         });
       } else {
@@ -84,8 +82,7 @@ const updateService = (req, res) => {
           data: {
             id,
             name,
-            description,
-            price
+            description
           }
         });
       }

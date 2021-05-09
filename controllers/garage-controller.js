@@ -9,10 +9,10 @@ const createGarage = (req, res) => {
     });
   }
 
-  const { name, description, owner_id, service_id, region_id, willayat_id } = req.body;
+  const { name, description, owner_id, service_id, service_price, region_id, willayat_id } = req.body;
 
-  pool.query("INSERT INTO `garages` (name, description, owner_id, service_id, region_id, willayat_id) VALUES (?, ?, ?, ?, ?, ?)",
-    [name, description, owner_id, service_id, region_id, willayat_id], (err, result, fields) => {
+  pool.query("INSERT INTO `garages` (name, description, owner_id, service_id, service_price, region_id, willayat_id) VALUES (?, ?, ?, ?, ?, ?, ?)",
+    [name, description, owner_id, service_id, service_price, region_id, willayat_id], (err, result, fields) => {
       if (err) {
         res.json({
           status: "error",
@@ -63,10 +63,10 @@ const updateGarage = (req, res) => {
   }
 
   const { id } = req.params;
-  const { name, description, owner_id, service_id, region_id, willayat_id } = req.body;
+  const { name, description, owner_id, service_id, service_price, region_id, willayat_id } = req.body;
 
-  pool.query("UPDATE `garages` SET name = ?, description = ?, owner_id = ?, service_id = ?, region_id = ?, willayat_id = ? WHERE id = ?",
-    [name, description, owner_id, service_id, region_id, willayat_id, id],
+  pool.query("UPDATE `garages` SET name = ?, description = ?, owner_id = ?, service_id = ?, service_price = ?, region_id = ?, willayat_id = ? WHERE id = ?",
+    [name, description, owner_id, service_id, service_price, region_id, willayat_id, id],
     (err, result, fields) => {
       if (err) {
         res.json({
@@ -173,7 +173,7 @@ const getGarageById = (req, res) => {
 }
 
 const getAllGarages = (req, res) => {
-  pool.query("SELECT g.id, g.name, g.description, g.owner_id, u.name as 'owner_name', g.service_id, s.name as 'service_name', s.price as 'service_price', g.region_id, r.name as 'region_name', g.willayat_id, w.name as 'willayat_name' FROM `garages` g LEFT JOIN `services` s ON s.id = g.service_id LEFT JOIN `users` u ON u.id = g.owner_id LEFT JOIN `regions` r ON r.id = g.region_id LEFT JOIN `willayats` w ON w.id = g.willayat_id", (err, results, fields) => {
+  pool.query("SELECT g.id, g.name, g.description, g.owner_id, u.name as 'owner_name', g.service_id, s.name as 'service_name', g.service_price, g.region_id, r.name as 'region_name', g.willayat_id, w.name as 'willayat_name' FROM `garages` g LEFT JOIN `services` s ON s.id = g.service_id LEFT JOIN `users` u ON u.id = g.owner_id LEFT JOIN `regions` r ON r.id = g.region_id LEFT JOIN `willayats` w ON w.id = g.willayat_id", (err, results, fields) => {
     if (err) {
       res.json({
         status: "error",
@@ -199,9 +199,9 @@ const getAllGaragesByRegionIdAndWillayatId = (req, res) => {
     });
   }
 
-  const { region_id, willayat_id } = req.body;
+  const { region_id, willayat_id, service_id } = req.body;
 
-  pool.query("SELECT * FROM `garages` WHERE region_id = ? AND willayat_id = ?", [region_id, willayat_id], (err, result, fields) => {
+  pool.query("SELECT * FROM `garages` WHERE region_id = ? AND willayat_id = ? AND service_id = ?", [region_id, willayat_id, service_id], (err, result, fields) => {
     if (err) {
       res.json({
         status: "error",
@@ -247,7 +247,7 @@ const getFullGarageDetails = (req, res) => {
 
   const { id } = req.params;
 
-  pool.query("SELECT g.*, u.name as 'owner_name', s.name as 'service_name', s.price as 'service_price', r.name as 'region_name', w.name as 'willayat_name' FROM `garages` g LEFT JOIN `users` u ON g.owner_id = u.id LEFT JOIN `services` s ON g.service_id = s.id LEFT JOIN `regions` r ON g.region_id = r.id LEFT JOIN `willayats` w ON g.willayat_id = w.id WHERE g.id = ?", [id], (err, result, fields) => {
+  pool.query("SELECT g.*, u.name as 'owner_name', s.name as 'service_name', g.service_price, r.name as 'region_name', w.name as 'willayat_name' FROM `garages` g LEFT JOIN `users` u ON g.owner_id = u.id LEFT JOIN `services` s ON g.service_id = s.id LEFT JOIN `regions` r ON g.region_id = r.id LEFT JOIN `willayats` w ON g.willayat_id = w.id WHERE g.id = ?", [id], (err, result, fields) => {
     if (err) {
       res.json({
         status: "error",
@@ -283,7 +283,7 @@ const getOwnerGarages = (req, res) => {
 
   const { owner_id } = req.params;
 
-  pool.query("SELECT g.*, u.name as 'owner_name', s.name as 'service_name', r.name as 'region_name', w.name as 'willayat_name' FROM `garages` g LEFT JOIN `users` u ON g.owner_id = u.id LEFT JOIN `services` s ON g.service_id = s.id LEFT JOIN `regions` r ON g.region_id = r.id LEFT JOIN `willayats` w ON g.willayat_id = w.id WHERE g.owner_id = ?", [owner_id], (err, result, fields) => {
+  pool.query("SELECT g.*, u.name as 'owner_name', s.name as 'service_name', g.service_price, r.name as 'region_name', w.name as 'willayat_name' FROM `garages` g LEFT JOIN `users` u ON g.owner_id = u.id LEFT JOIN `services` s ON g.service_id = s.id LEFT JOIN `regions` r ON g.region_id = r.id LEFT JOIN `willayats` w ON g.willayat_id = w.id WHERE g.owner_id = ?", [owner_id], (err, result, fields) => {
     if (err) {
       res.json({
         status: "error",
