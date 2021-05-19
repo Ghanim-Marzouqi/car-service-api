@@ -4,8 +4,8 @@ const sendMail = (email, subject, message) => {
   const transport = nodemailer.createTransport({
     service: "Hotmail",
     auth: {
-      user: "optimist_gm@hotmail.com",
-      pass: "GmOptimist9"
+      user: "<hotmail>",
+      pass: "<password>"
     },
     secure: false,
     tls: {
@@ -14,7 +14,7 @@ const sendMail = (email, subject, message) => {
   });
 
   var mailOptions = {
-    from: '"Car Service" <optimist_gm@hotmail.com>',
+    from: '"Car Service" <hotmail>',
     to: email,
     subject: subject,
     text: message,
